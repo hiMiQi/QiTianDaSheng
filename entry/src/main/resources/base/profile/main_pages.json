@@ -1,6 +1,8 @@
 {
   "src": [
     "pages/Index",
-    "pages/Todo"
+    "pages/Todo",
+    "pages/NoteEdit",
+    "pages/Recipe"
   ]
 }

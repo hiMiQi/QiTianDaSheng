@@ -25,11 +25,11 @@ struct Index {
 
       // 主内容区（中间空态）
       Column() {
-        Image($r('app.media.daiban'))
+        Image($r('app.media.xie'))
           .width(100)
           .height(100)
           .opacity(0.9)
-          .margin({ left: 2 })
+          .margin({ left: 22 })
         Text('没有待办')
           .fontSize(18)
           .fontColor('#9AA0A6')
@@ -45,12 +45,15 @@ struct Index {
         Image($r('app.media.tianjia'))
           .width(64)
           .height(64)
+          .onClick(() => {
+            router.pushUrl({ url: 'pages/NoteEdit' })
+          })
       }
       .width('100%')
       .justifyContent(FlexAlign.End)
       .padding({ right: 24, bottom: 24 })
 
-      // 底部导航：笔记 / 待办（固定在最底部）
+      // 底部导航：笔记 / 菜谱 / 待办（固定在最底部）
       Row() {
         Column() {
           Image($r('app.media.caidan'))
@@ -67,7 +70,22 @@ struct Index {
         .onClick(() => {
           router.pushUrl({ url: 'pages/Index' })
         })
-
+      
+        // 中间：菜谱
+        Column() {
+          Image($r('app.media.cai'))
+            .width(24)
+            .height(24)
+          Text('菜谱')
+            .fontSize(12)
+            .fontColor('#999999')
+            .margin({ top: 4 })
+        }
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Center)
+        .flexGrow(1)
+        .onClick(() => { router.replaceUrl({ url: 'pages/Recipe' }) })
+      
         Column() {
           Image($r('app.media.daiban_active'))
             .width(24)
