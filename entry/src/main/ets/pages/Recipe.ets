@@ -8,6 +8,7 @@ struct Recipe {
   @State activeTab: string = 'dessert'
   @State imageErrorMap: Record<number, boolean> = {}
   @State pixelMapMap: Record<number, any> = {}
+  @State errorInfoMap: Record<number, string> = {}
   desserts: Array<any> = [
       { title: '提拉米苏', img: 'https://images.unsplash.com/photo-1541976076758-3c0b0e75f3ef?w=400&h=300&fit=crop' },
       { title: '草莓蛋糕', img: 'https://images.unsplash.com/photo-1483691278017-0d0a89af3979?w=400&h=300&fit=crop' },
@@ -86,7 +87,7 @@ struct Recipe {
                 .borderRadius(10)
             } else if (this.imageErrorMap[i]) {
               Column() {
-                Text('图片加载失败')
+                Text(this.errorInfoMap[i] ? `图片加载失败 (${this.errorInfoMap[i]})` : '图片加载失败')
                   .fontSize(12)
                   .fontColor('#999999')
               }
@@ -173,28 +174,67 @@ struct Recipe {
     .backgroundColor('#FFFFFF')
   }
   async loadImage(idx: number, url: string) {
-    try {
-      const client = http.createHttp();
-      const res = await client.request(url, {
-        method: http.RequestMethod.GET,
-        expectDataType: http.HttpDataType.ARRAY_BUFFER,
-      });
-      client.destroy();
-      const buf = (res && res.result) ? res.result as ArrayBuffer : undefined;
-      if (!buf) {
-        this.imageErrorMap = { ...this.imageErrorMap, [idx]: true };
-        return;
-      }
-      const src = image.createImageSource(buf);
-      src.createPixelMap((err, pm) => {
-        if (err || !pm) {
-          this.imageErrorMap = { ...this.imageErrorMap, [idx]: true };
-          return;
-        }
-        this.pixelMapMap = { ...this.pixelMapMap, [idx]: pm };
-      });
-    } catch (_e) {
+    const markError = (msg: string) => {
       this.imageErrorMap = { ...this.imageErrorMap, [idx]: true };
+      this.errorInfoMap = { ...this.errorInfoMap, [idx]: msg };
+    };
+
+    const fetchPixelMap = async (targetUrl: string): Promise<any> => {
+      const client = http.createHttp();
+      try {
+        const res = await client.request(targetUrl, {
+          method: http.RequestMethod.GET,
+          expectDataType: http.HttpDataType.ARRAY_BUFFER,
+          readTimeout: 15000,
+          connectTimeout: 10000,
+          header: {
+            'User-Agent': 'FanQue/1.0 (HarmonyOS ArkUI)',
+            'Accept': 'image/*',
+            'Referer': 'https://images.unsplash.com/'
+          }
+        });
+        console.info(`Recipe image url=${targetUrl} code=${res.responseCode}`);
+        const buf = (res && res.result) ? (res.result as ArrayBuffer) : undefined;
+        if (!buf) { throw new Error('empty buffer'); }
+        const src = image.createImageSource(buf);
+        const pm = await new Promise<any>((resolve, reject) => {
+          src.createPixelMap((err, out) => {
+            if (err || !out) { reject(err || new Error('decode failed')); }
+            else { resolve(out); }
+          });
+        });
+        return pm;
+      } finally {
+        client.destroy();
+      }
+    };
+
+    try {
+      const pm = await fetchPixelMap(url);
+      this.pixelMapMap = { ...this.pixelMapMap, [idx]: pm };
+      this.errorInfoMap = { ...this.errorInfoMap, [idx]: '' };
+    } catch (e1) {
+      console.error(`primary image failed i=${idx} err=${e1}`);
+      // 备用源1：HTTPS picsum
+      const fallback1 = `https://picsum.photos/seed/fanque-${idx}/600/360`;
+      try {
+        const pm2 = await fetchPixelMap(fallback1);
+        this.pixelMapMap = { ...this.pixelMapMap, [idx]: pm2 };
+        this.errorInfoMap = { ...this.errorInfoMap, [idx]: '' };
+        return;
+      } catch (e2) {
+        console.error(`fallback1 failed i=${idx} err=${e2}`);
+      }
+      // 备用源2：HTTP placekitten（用于判断是否为TLS证书问题）
+      const fallback2 = `http://placekitten.com/600/360`;
+      try {
+        const pm3 = await fetchPixelMap(fallback2);
+        this.pixelMapMap = { ...this.pixelMapMap, [idx]: pm3 };
+        this.errorInfoMap = { ...this.errorInfoMap, [idx]: '' };
+      } catch (e3) {
+        console.error(`fallback2 failed i=${idx} err=${e3}`);
+        markError('网络/证书受限');
+      }
     }
   }
 }
