@@ -20,6 +20,7 @@ struct Index {
         Image($r('app.media.shezhi'))
           .width(24)
           .height(24)
+          .onClick(() => router.pushUrl({ url: 'pages/Settings' }))
       }
       .width('100%')
       .padding({ left: 20, right: 20, top: 12, bottom: 0 })
