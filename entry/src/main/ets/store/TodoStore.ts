@@ -7,8 +7,8 @@ export function getTodos(): TodoItem[] {
 }
 
 export function addTodo(item: TodoItem): void {
-  // 新增放在顶部，保持从上往下（新到旧）显示
-  todos = [item, ...todos]
+  // 新增追加到底部，保持自上而下（旧在上，新在下），首项位置不变
+  todos = [...todos, item]
 }
 
 export function toggleDone(index: number): void {
