@@ -188,7 +188,7 @@ struct Recipe {
       // 底部导航
       Row() {
         Column() {
-          Image($r('app.media.wenjianjia')).width(24).height(24)
+          Image($r('app.media.caidan')).width(24).height(24)
           Text('笔记').fontSize(12).fontColor('#999')
         }
         .flexGrow(1)
