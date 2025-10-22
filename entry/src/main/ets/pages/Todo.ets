@@ -122,6 +122,7 @@ struct Index {
           }
         }
         .width('100%')
+        .height('100%')
         .padding({ left: 8, right: 8, top: 0, bottom: 0 })
         .margin({ top: 0 })
 
@@ -189,6 +190,21 @@ struct Index {
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center)
         .flexGrow(1)
+
+        // 右侧：我的
+        Column() {
+          Image($r('app.media.mine'))
+            .width(24)
+            .height(24)
+          Text('我的')
+            .fontSize(12)
+            .fontColor('#999999')
+            .margin({ top: 4 })
+        }
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Center)
+        .flexGrow(1)
+        .onClick(() => { router.pushUrl({ url: 'pages/Mine' }) })
       }
       .width('100%')
       .height(72)

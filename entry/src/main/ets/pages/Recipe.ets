@@ -8,7 +8,6 @@ struct Recipe {
   @State activeTab: string = 'dessert'
   @State imageErrorMap: Record<string, boolean> = {}
   @State remoteUrlMap: Record<string, string> = {}
-  @State diagnosis: string = '热门食谱'
 
   desserts: Array<any> = [
     { id: 'd1', title: '巧克力蛋糕', img: 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=400&h=300&fit=crop' },
@@ -104,10 +103,6 @@ struct Recipe {
     Column() {
       // 顶部标题栏
       Row() {
-        Text('←')
-          .fontSize(22)
-          .fontColor('#444')
-          .onClick(() => router.back())
         Text('菜谱')
           .fontSize(20)
           .fontWeight(FontWeight.Medium)
@@ -122,16 +117,16 @@ struct Recipe {
 
       // 网络诊断
       Row() {
-        Text(this.diagnosis)
-          .fontSize(10)
+        Text('热门菜谱')
+          .fontSize(12)
           .fontColor('#9AA0A6')
-          .layoutWeight(1)
         Button('搜索')
           .height(25)
           .width(60)
-          .onClick(() => this.diagnose())
       }
       .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+      .alignItems(VerticalAlign.Center)
       .padding({ left: 20, right: 20, top: 6, bottom: 6 })
 
       // 分类切换
@@ -179,8 +174,6 @@ struct Recipe {
                   .height(160)
                   .objectFit(ImageFit.Cover)
                   .borderRadius(10)
-                  .onError((err) => this.retryImage(it))
-                  .onComplete(() => console.info(`✅ 图片加载成功 id=${it.id}`))
               }
 
               Text(it.title)
@@ -194,7 +187,6 @@ struct Recipe {
             .borderRadius(12)
             .padding({ left: 12, right: 12, top: 12, bottom: 12 })
             .margin({ left: 28, right: 28, bottom: 12 })
-            .onAppear(() => this.loadImage(it.id, it.img))
             .onClick(() => {
               const img = this.remoteUrlMap[it.id] ?? it.img;
               const steps = this.makeSteps(it.title);
@@ -229,6 +221,15 @@ struct Recipe {
         .flexGrow(1)
         .alignItems(HorizontalAlign.Center)
         .onClick(() => router.replaceUrl({ url: 'pages/Todo' }))
+
+        // 右侧：我的
+        Column() {
+          Image($r('app.media.mine')).width(24).height(24)
+          Text('我的').fontSize(12).fontColor('#999')
+        }
+        .flexGrow(1)
+        .alignItems(HorizontalAlign.Center)
+        .onClick(() => router.pushUrl({ url: 'pages/Mine' }))
       }
       .width('100%')
       .height(72)
@@ -240,55 +241,4 @@ struct Recipe {
     .backgroundColor('#FFF')
   }
 
-  async diagnose() {
-    const client = http.createHttp()
-    try {
-      const res = await client.request('https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=10&h=10', {
-        method: http.RequestMethod.GET,
-        readTimeout: 5000,
-        connectTimeout: 5000,
-      })
-      this.diagnosis = res.responseCode === 200 ? '网络正常 ✅' : `异常 code=${res.responseCode}`
-    } catch (e) {
-      this.diagnosis = '请求失败 ❌'
-      console.error('diagnose error:', e)
-    } finally {
-      client.destroy()
-    }
-  }
-
-  // ✅ 自动重试与备用图逻辑
-  async retryImage(item: any, attempt: number = 1) {
-    console.warn(`⚠️ 图片加载失败，准备重试（第${attempt}次） id=${item.id}`)
-    if (attempt < 3) {
-      setTimeout(() => {
-        // 加一个随机 Unsplash 关键词备用
-        const backupUrl = `${item.img}&sig=${Math.floor(Math.random() * 1000)}`
-        this.remoteUrlMap = { ...this.remoteUrlMap, [item.id]: backupUrl }
-      }, 500)
-    } else {
-      console.error(`❌ 多次重试失败 id=${item.id}`)
-      this.imageErrorMap = { ...this.imageErrorMap, [item.id]: true }
-    }
-  }
-
-  async loadImage(id: string, url: string) {
-    if (!url || typeof url !== 'string') {
-      console.error(`❌ 图片URL无效 id=${id}, url=${url}`)
-      this.imageErrorMap = { ...this.imageErrorMap, [id]: true }
-      return
-    }
-
-    let fixedUrl = url.trim()
-    if (fixedUrl.startsWith('https:') && !fixedUrl.startsWith('https://')) {
-      fixedUrl = fixedUrl.replace(/^https:/, 'https://')
-    } else if (!fixedUrl.startsWith('http')) {
-      console.warn(`⚠️ 异常URL已跳过 id=${id}, url=${fixedUrl}`)
-      this.imageErrorMap = { ...this.imageErrorMap, [id]: true }
-      return
-    }
-
-    this.remoteUrlMap = { ...this.remoteUrlMap, [id]: fixedUrl }
-    console.info(`🖼️ 设置图片URL id=${id}, url=${fixedUrl}`)
-  }
 }

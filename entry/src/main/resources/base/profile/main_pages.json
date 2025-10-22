@@ -7,6 +7,8 @@
     "pages/Recipe",
     "pages/RecipeDetail",
     "pages/Settings",
-    "pages/TodoEdit"
+    "pages/TodoEdit",
+    "pages/Mine",
+    "pages/Login"
   ]
 }

@@ -267,6 +267,21 @@ struct Index {
         .onClick(() => {
           router.pushUrl({ url: 'pages/Todo' })
         })
+
+        // 右侧：我的
+        Column() {
+          Image($r('app.media.mine'))
+            .width(24)
+            .height(24)
+          Text('我的')
+            .fontSize(12)
+            .fontColor('#999999')
+            .margin({ top: 4 })
+        }
+        .alignItems(HorizontalAlign.Center)
+        .justifyContent(FlexAlign.Center)
+        .flexGrow(1)
+        .onClick(() => { router.pushUrl({ url: 'pages/Mine' }) })
       }
       .width('100%')
       .height(72)
