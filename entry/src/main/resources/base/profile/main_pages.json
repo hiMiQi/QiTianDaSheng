@@ -3,6 +3,7 @@
     "pages/Index",
     "pages/Todo",
     "pages/NoteEdit",
+    "pages/NoteDetail",
     "pages/Recipe",
     "pages/RecipeDetail",
     "pages/Settings",

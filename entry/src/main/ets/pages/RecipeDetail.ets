@@ -40,7 +40,7 @@ struct RecipeDetail {
       }
       .width('100%')
       .height(56)
-      .padding({ left: 16, right: 16 })
+      .padding({ left: 16, right: 16, top: 8, bottom: 4 })
       .justifyContent(FlexAlign.SpaceBetween)
       .border({ width: 0.5, color: '#EEE' })
 
@@ -48,18 +48,19 @@ struct RecipeDetail {
       Column() {
         if (this.item && this.item.img) {
           Image(this.item.img)
-            .width('100%')
-            .height(220)
+            .width('88%')
+            .height(180)
             .objectFit(ImageFit.Cover)
             .borderRadius(12)
+            .alignSelf(ItemAlign.Center)
         }
         Text(this.item?.title || '未知菜品')
           .fontSize(22)
           .fontWeight(FontWeight.Bold)
-          .margin({ top: 12 })
+          .margin({ top: 20 })
       }
       .width('100%')
-      .padding({ left: 20, right: 20, top: 12 })
+      .margin({ top: 12 })
 
       // 制作步骤
       Column() {
@@ -87,7 +88,7 @@ struct RecipeDetail {
         }
       }
       .width('100%')
-      .padding({ left: 20, right: 20, top: 12 })
+      .padding({ left: 20, right: 20, top: 18 })
       .layoutWeight(1)
 
       // 底部导航：返回列表
