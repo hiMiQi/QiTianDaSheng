@@ -87,6 +87,7 @@ struct Login {
             const acc = this.account.trim();
             const pwd = this.password.trim();
             if (acc === 'admin' && pwd === 'admin') {
+              AppStorage.SetOrCreate('loggedIn', true);
               router.replaceUrl({ url: 'pages/Index' })
             } else {
               promptAction.showDialog({
@@ -126,7 +127,10 @@ struct Login {
           .borderRadius(24)
           .borderColor('#3B82F6')
           .borderWidth(1)
-          .onClick(() => router.replaceUrl({ url: 'pages/Index' }))
+          .onClick(() => {
+            AppStorage.SetOrCreate('loggedIn', false);
+            router.replaceUrl({ url: 'pages/Index' })
+          })
       }
       .width('100%')
       .height(72)

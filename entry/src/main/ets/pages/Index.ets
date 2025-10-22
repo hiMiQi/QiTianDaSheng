@@ -6,6 +6,7 @@ struct Index {
   @State notes: Array<any> = []
   @State selectedCategory: string = '全部'
   @State keyword: string = ''
+  @StorageLink('loggedIn') loggedIn: boolean = false
   private longPressTimer: number = -1
   private longPressTriggered: boolean = false
   aboutToAppear() {
