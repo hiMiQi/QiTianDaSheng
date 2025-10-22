@@ -154,9 +154,9 @@ struct Mine {
              .backgroundColor('#E6F7FF')
              .border({ width: 1, color: '#36C7F3' })
              .onClick(() => {
-               AppStorage.SetOrCreate('loggedIn', false);
-               router.replaceUrl({ url: 'pages/Index' })
-             })
+                AppStorage.SetOrCreate('loggedIn', false);
+                router.replaceUrl({ url: 'pages/Login' })
+              })
         }
         .width('100%')
         .layoutWeight(1)
@@ -229,14 +229,14 @@ struct Mine {
           router.pushUrl({ url: 'pages/Todo' })
         })
 
-        // 右侧：我的
+        // 右侧：我的（当前页高亮）
         Column() {
-          Image($r('app.media.mine'))
+          Image($r('app.media.mine_active'))
             .width(24)
             .height(24)
           Text('我的')
             .fontSize(12)
-            .fontColor('#999999')
+            .fontColor('#36C7F3')
         }
         .alignItems(HorizontalAlign.Center)
         .justifyContent(FlexAlign.Center)

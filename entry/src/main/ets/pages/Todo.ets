@@ -132,7 +132,7 @@ struct Index {
               .width(64)
               .height(64)
               .onClick(() => { router.pushUrl({ url: 'pages/TodoEdit' }) })
-              .margin({ right: 48, bottom: 25 })
+              .margin({ right: 20, bottom: 20 })
           }
           .width('100%')
           .height('100%')
