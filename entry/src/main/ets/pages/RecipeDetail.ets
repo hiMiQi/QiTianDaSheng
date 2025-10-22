@@ -68,6 +68,7 @@ struct RecipeDetail {
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .margin({ bottom: 8 })
+          .textAlign(TextAlign.Start)
         if (this.steps && this.steps.length > 0) {
           ForEach(this.steps, (s: string, i: number) => {
             Row() {
@@ -75,21 +76,27 @@ struct RecipeDetail {
                 .fontSize(16)
                 .fontColor('#666')
                 .width(24)
+                .textAlign(TextAlign.Start)
               Text(s)
                 .fontSize(16)
                 .fontColor('#333')
+                .textAlign(TextAlign.Start)
             }
+            .justifyContent(FlexAlign.Start)
             .margin({ bottom: 10 })
           })
         } else {
           Text('暂无制作步骤')
             .fontSize(14)
             .fontColor('#999')
+            .textAlign(TextAlign.Start)
         }
       }
-      .width('100%')
-      .padding({ left: 20, right: 20, top: 18 })
+      .width('88%')
+      .padding({ left: 0, right: 0, top: 18 })
       .layoutWeight(1)
+      .alignSelf(ItemAlign.Center)
+      .alignItems(HorizontalAlign.Start)
 
       // 底部导航：返回列表
       Row() {

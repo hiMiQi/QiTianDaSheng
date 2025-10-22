@@ -4,6 +4,7 @@ import { getTodos, toggleDone } from '../store/TodoStore'
 @Component
 struct Index {
   @State todos: Array<any> = []
+  @State keyword: string = ''
   aboutToAppear() {
     this.todos = getTodos();
   }
@@ -17,7 +18,7 @@ struct Index {
           .onClick(() => router.pushUrl({ url: 'pages/Settings' }))
       }
       .width('100%')
-      .padding({ left: 20, right: 20, top: 12, bottom: 0 })
+      .padding({ left: 20, right: 20, top: 8, bottom: 0 })
       .justifyContent(FlexAlign.End)
 
       // 标题单独一行
@@ -27,7 +28,31 @@ struct Index {
           .fontWeight(FontWeight.Bold)
       }
       .width('100%')
-      .padding({ left: 20, right: 20, top: 8, bottom: 8 })
+      .padding({ left: 20, right: 20, top: 4, bottom: 0 })
+      .margin({ bottom: 8 })
+
+      // 搜索栏（参考笔记页样式）
+      Row() {
+        Image($r('app.media.search'))
+          .width(18)
+          .height(18)
+          .margin({ left: 12, right: 8 })
+        TextInput({ placeholder: '搜索标题或内容' })
+          .height(36)
+          .backgroundColor('#00000000')
+          .borderRadius(18)
+          .fontSize(14)
+          .flexGrow(1)
+          .onChange((value: string) => { this.keyword = value })
+      }
+      .width('88%')
+      .height(40)
+      .backgroundColor('#F5F6F7')
+      .borderRadius(20)
+      .alignItems(VerticalAlign.Center)
+      .padding({ left: 16, right: 16 })
+      .margin({ top: 16, bottom: 18 })
+      .alignSelf(ItemAlign.Center)
 
       // 主内容区：有数据则展示列表，否则空态
       if (this.todos.length === 0) {
@@ -47,62 +72,77 @@ struct Index {
         .alignItems(HorizontalAlign.Center)
         .layoutWeight(1)
       } else {
-        Scroll() {
-          Column() {
-            ForEach(this.todos, (t: any, i: number) => {
+        Stack() {
+          Scroll() {
+            Column() {
+            // 使用关键字过滤
+            ForEach(this.todos.filter((t: any) => (this.keyword.trim() === '' || (t.title?.includes(this.keyword) || t.detail?.includes(this.keyword)))), (t: any, i: number) => {
               Column() {
                 Row() {
-                  Text(t.done ? '✓' : '○')
+                  Text(t.done ? '☑' : '□')
                     .fontSize(20)
-                    .fontColor(t.done ? '#4CAF50' : '#CCCCCC')
-                    .margin({ right: 8 })
+                    .fontColor(t.done ? '#9AA0A6' : '#9AA0A6')
+                    .margin({ right: 12 })
                     .onClick(() => {
-                      toggleDone(i)
+                      toggleDone(this.todos.indexOf(t))
                       this.todos = getTodos()
                     })
                   Text(t.title || '待办')
                     .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
+                    .fontWeight(FontWeight.Bold)
                     .fontColor(t.done ? '#A0A7AF' : '#222222')
-                  Blank().layoutWeight(1)
+                    .layoutWeight(1)
                   Text(t.createdAt || '')
                     .fontSize(12)
-                    .fontColor('#A0A7AF')
+                    .fontColor(t.done ? '#B0B7C3' : '#9AA0A6')
                 }
                 .width('100%')
-                .padding({ left: 12, right: 12, top: 10, bottom: 6 })
+                .padding({ left: 0, right: 0, top: 0, bottom: 0 })
 
                 if (t.detail) {
                   Text(t.detail)
-                    .fontSize(14)
+                    .fontSize(15)
                     .fontColor(t.done ? '#AAAAAA' : '#444444')
-                    .padding({ left: 12, right: 12, bottom: 10 })
+                    .margin({ top: 8 })
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .maxLines(1)
+                    .padding({ left: 0, right: 0, bottom: 0 })
+                    .maxLines(2)
+                    .padding({ left: 20, right: 20, bottom: 14 })
                 }
               }
               .width('100%')
-              .backgroundColor(t.done ? '#F7F7F7' : '#FFFFFF')
-              .borderRadius(12)
-              .margin({ left: 16, right: 16, top: 8 })
-              .border({ width: 0.5, color: '#EEEEEE' })
+              .backgroundColor('#FFFFFF')
+              .border({ width: 1, color: '#E5E5E5' })
+              .borderRadius(20)
+              .padding({ left: 20, right: 20, top: 16, bottom: 16 })
+              .margin({ left: 28, right: 28, top: 6, bottom: 10 })
+              .alignItems(HorizontalAlign.Start)
             })
           }
+        }
+        .width('100%')
+        .padding({ left: 8, right: 8, top: 0, bottom: 0 })
+        .margin({ top: 0 })
+
+          // 悬浮添加按钮覆盖显示（不占用垂直空间）
+          Row() {
+            Image($r('app.media.tianjia'))
+              .width(64)
+              .height(64)
+              .onClick(() => { router.pushUrl({ url: 'pages/TodoEdit' }) })
+              .margin({ right: 48, bottom: 25 })
+          }
           .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.End)
+          .alignItems(VerticalAlign.Bottom)
+          .hitTestBehavior(HitTestMode.Transparent)
         }
         .width('100%')
         .layoutWeight(1)
       }
 
-      // 悬浮添加按钮：位于底部导航上方，右下角
-      Row() {
-        Image($r('app.media.tianjia'))
-          .width(64)
-          .height(64)
-          .onClick(() => {
-            router.pushUrl({ url: 'pages/TodoEdit' })
-          })
-      }
-      .width('100%')
-      .justifyContent(FlexAlign.End)
 
       // 底部导航：笔记 / 菜谱 / 待办（固定在最底部）
       Row() {

@@ -10,9 +10,7 @@ struct Index {
   private longPressTriggered: boolean = false
   aboutToAppear() {
     const params: any = router.getParams();
-    if (params && params.newNote) {
-      this.notes = [params.newNote, ...this.notes];
-    }
+    // 先初始化默认数据（避免添加新笔记时只剩一条）
     if (this.notes.length === 0) {
       const now = new Date();
       this.notes = [
@@ -26,7 +24,13 @@ struct Index {
         { title: '技术笔记：列表虚拟化与性能', category: '学习', createdAt: this.formatDate(new Date(now.getTime() - 4*24*60*60*1000 + 14*60*60*1000)), content: '问题：长列表卡顿。\n方案：窗口化渲染、按需加载、骨架屏占位。\n指标：首屏 1.2s→0.7s，滚动丢帧率降至 3%。\n注意：图片尺寸规范与缓存策略同样关键。' },
         { title: '旅行清单：周末露营准备', category: '日常', createdAt: this.formatDate(new Date(now.getTime() - 3*24*60*60*1000 + 10*60*60*1000)), content: '必备：帐篷/地垫/睡袋；头灯；便携炉。\n食物：高蛋白与耐储存；补水充足。\n安全：天气预报、路线分享、备用电源。' },
           { title: '生活随记：晨间仪式与睡眠', category: '日常', createdAt: this.formatDate(new Date(now.getTime() - 1*24*60*60*1000 + 21*60*60*1000)), content: '晨间：拉伸 5min、呼吸练习 3min、阳光照射 10min。\n睡眠：固定入睡时间；卧室降噪与遮光；减少睡前屏幕。\n感受：清醒度提升，午后困倦减少，入睡更快。' },
-        ];
+      ];
+    }
+    // 再插入新笔记到列表顶部（若无分类，默认归入“学习”）
+    if (params && params.newNote) {
+      const nn = { ...params.newNote };
+      nn.category = nn.category ?? '学习';
+      this.notes = [nn, ...this.notes];
     }
   }
   
@@ -94,7 +98,7 @@ struct Index {
       .margin({ top: 16, bottom: 8 })
       .alignSelf(ItemAlign.Center)
 
-      // 分类/导航：全部 学习 导航栏（整体下移一些）
+      // 分类/导航：全部 学习 导航栏
       Row() {
         Text('全部')
           .fontSize(16)
@@ -208,7 +212,7 @@ struct Index {
              .onClick(() => {
                router.pushUrl({ url: 'pages/NoteEdit' })
              })
-             .margin({ right: 24, bottom: 8 })
+             .margin({ right: 28, bottom: 25 })
          }
          .width('100%')
           .height('100%')

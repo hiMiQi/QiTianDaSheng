@@ -42,7 +42,8 @@ struct NoteEdit {
         .onClick(() => {
           const t = this.title && this.title.trim().length > 0 ? this.title.trim() : '无标题'
           const c = this.content || ''
-          router.replaceUrl({ url: 'pages/Index', params: { newNote: { title: t, content: c, createdAt: this.createdAt } } })
+          const cat = '学习'
+          router.replaceUrl({ url: 'pages/Index', params: { newNote: { title: t, content: c, createdAt: this.createdAt, category: cat } } })
         })
       }
       .width('100%')
